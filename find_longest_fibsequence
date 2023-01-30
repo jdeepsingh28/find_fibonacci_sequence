@@ -1,17 +1,31 @@
-	public int find_longest_fibsequence2(int[] arr) {
+Given a list (or vector) of numbers, find the longest fibonacci substring in this list?
+Example: list = [1, 4, 5, 1, 1, 2, 3, 5, 5, 6, 3, 5, 8, 13, 21, 34, 55, 1, 1, 2, 0]
+Your answer should return 7 (length of longest fib substring).
+
+
+	public boolean fib_helper(int input) {
+		boolean is_fib = false;
+		int a = (int) Math.sqrt(5*input*input + 4);
+		int b = (int) Math.sqrt(5*input*input - 4);
+		if (a*a == 5*input*input + 4 || b*b == 5*input*input - 4) {
+			is_fib = true;
+		}
+		return is_fib;
+	}
+	
+	public int find_longest_fibsequence(int[] arr) {
 		int temp = 0;
 		int sequence_length = 0;
 		for (int i=2; i < arr.length; i++) {
-			temp = 0;
-			while (arr[i] == arr[i-1] + arr[i-2]) {
-				//System.out.println(arr[i-2] + ", " + arr[i-1] + ", " + arr[i]);
+			temp = 2;
+			while (arr[i] == arr[i-1] + arr[i-2] && this.fib_helper(arr[i]) == true && this.fib_helper(arr[i-2]) == true
+					&& this.fib_helper(arr[i-1]) == true) {
 				temp++;
 				i++;
 			}
-			if (temp > 0) {
+			if (temp > sequence_length) {
 				sequence_length = temp;
-				//System.out.println("Temp: " + temp);
 			}
 		}
-		return sequence_length + 2;
+		return sequence_length;
 	}
