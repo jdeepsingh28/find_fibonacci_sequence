@@ -1,0 +1,20 @@
+Find all the prime numbers between 2 given numbers	
+  
+  
+  public Queue prime_numbers(int[] arr, int start, int end) {
+		Queue<Integer> numbers = new LinkedList<>();
+		int x = 0;
+		for (int i=0; i < arr.length; i++) {
+			if (arr[i] == start) {
+				for (int j=i; j < arr.length; j++)
+					if (arr[j] == end) {
+						return numbers;
+					}
+					else if (arr[j] == 2 || arr[j] % 2 == 1) {
+						numbers.add(arr[j]);
+						x++;
+				}
+			}	
+		}
+		return numbers;
+	}
