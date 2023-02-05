@@ -1,7 +1,12 @@
+*/
 Given a list (or vector) of numbers, find the longest fibonacci substring in this list?
 Example: list = [1, 4, 5, 1, 1, 2, 3, 5, 5, 6, 3, 5, 8, 13, 21, 34, 55, 1, 1, 2, 0]
 Your answer should return 7 (length of longest fib substring).
+*/
 
+*/
+As of right now method 3 is the fastest for the test case in the question above (tester 1). However, method 3 is the slowest when asked to find the sequence in a 1000 random arrays (tester 2).
+Also worth nothing that method 1 does not work correctly for all cases and is therefore invalid.
 
 	public boolean fib_helper(int input) {
 		boolean is_fib = false;
@@ -13,19 +18,180 @@ Your answer should return 7 (length of longest fib substring).
 		return is_fib;
 	}
 	
-	public int find_longest_fibsequence(int[] arr) {
+	public int find_longest_fibsequence_1(int[] arr) {
 		int temp = 0;
 		int sequence_length = 0;
 		for (int i=2; i < arr.length; i++) {
 			temp = 2;
-			while (arr[i] == arr[i-1] + arr[i-2] && this.fib_helper(arr[i]) == true && this.fib_helper(arr[i-2]) == true
-					&& this.fib_helper(arr[i-1]) == true) {
-				temp++;
-				i++;
+			while (arr[i] == arr[i-1] + arr[i-2] && this.fib_helper(arr[i]) == true && this.fib_helper(arr[i-2]) == true && this.fib_helper(arr[i-1])) {
+					temp++;
+					i++;
 			}
 			if (temp > sequence_length) {
 				sequence_length = temp;
 			}
 		}
+		//System.out.println("1: " + sequence_length);
 		return sequence_length;
+	}
+	
+	public int find_longest_fibsequence_2(int[] arr) {
+		int temp = 0;
+		int sequence_length = 0;
+		Hashtable<Integer, Integer> fib_storage = new Hashtable<Integer, Integer>();
+		for (int i=2; i < arr.length; i++) {
+			temp = 2;
+			while (arr[i] == arr[i-1] + arr[i-2]) {
+				if (fib_storage.containsKey(arr[i])) {
+					temp++;
+					i++;
+				}
+				else if (this.fib_helper(arr[i]) == true && this.fib_helper(arr[i-2]) == true
+						&& this.fib_helper(arr[i-1]) == true) {
+					fib_storage.put(arr[i],arr[i]); //find a better key than i
+					temp++;
+					i++;
+				}
+				else {
+					//System.out.println(arr[i-2] + ", " + arr[i-1] + ", " + arr[i]);
+					i++;
+				}
+			}
+			if (temp > sequence_length) {
+				sequence_length = temp;
+			}
+		}
+		//Enumeration<Integer> values = fib_storage.elements();
+		//while (values.hasMoreElements()) {
+		//	System.out.println("fib_storage: " + values.nextElement());
+		//}
+		//System.out.println("2: " + sequence_length);
+		return sequence_length;
+	}
+	
+	public int find_longest_fibsequence_3(int[] arr) {
+		int temp = 0;
+		int sequence_length = 0;
+    		int num1 = 0, num2 = 1;
+    		int counter = 0;
+    		Hashtable<Integer, Integer> fib_storage = new Hashtable<Integer, Integer>();
+    		while (counter < 100) {
+    			if (num1 == 0 && num2 == 1) {
+    				fib_storage.put(num1, num2);
+    				//System.out.println("Key: " + num1 + ", " + "Value: " + num2);
+    			}
+    			int num3 = num2 + num1;
+        		fib_storage.put(num2, num3);
+        		//System.out.println("Key: " + num2 + ", " + "Value: " + num3);
+        		num1 = num2;
+        		num2 = num3;
+        		counter++;
+    		}
+    		for (int i=0; i<arr.length-1; i++) {
+    			if (fib_storage.containsKey(arr[i])) {
+    				temp++;
+    				//System.out.println(arr[i] + ", " + fib_storage.get(arr[i]));
+    				if (arr[i+1] == fib_storage.get(arr[i])) {
+    					temp++;
+    					i++;
+        				//System.out.println("2: " + arr[i+1]);
+    				}
+    			}
+    			else {
+    				if (temp > sequence_length) {
+    					sequence_length = temp;
+    				}
+    				temp=0;
+    			}
+    		}
+		return sequence_length;
+	}
+	
+	public long[] fib_tester_1() {
+		int[] test = new int[21];
+    		long[] times = new long[3];
+		test[0] = 1;
+		test[1] = 4;
+		test[2] = 5;
+		test[3] = 1;
+		test[4] = 1;
+		test[5] = 2;
+		test[6] = 3;
+		test[7] = 5;
+		test[8] = 5;
+		test[9] = 6;
+		test[10] = 3;
+		test[11] = 5;
+		test[12] = 8;
+		test[13] = 13;
+		test[14] = 21;
+		test[15] = 34;
+		test[16] = 55;
+		test[17] = 1;
+		test[18] = 1;
+		test[19] = 2;
+		test[20] = 0;
+		
+		//method 1
+		long startTime1 = System.nanoTime();
+		System.out.println(this.find_longest_fibsequence_1(test));
+		long endTime1 = System.nanoTime();
+		long totaltime1 = endTime1 - startTime1;
+		times[0] = totaltime1;
+    	
+		//method 2
+		long startTime2 = System.nanoTime();
+		System.out.println(this.find_longest_fibsequence_2(test));
+		long endTime2 = System.nanoTime();
+		long totaltime2 = endTime2 - startTime2;
+		times[1] = totaltime2;
+
+		//method 3
+		long startTime3 = System.nanoTime();
+		System.out.println(this.find_longest_fibsequence_3(test));
+		long endTime3 = System.nanoTime();
+		long totaltime3 = endTime3 - startTime3;
+		times[2] = totaltime3;
+
+		return times;
+	}
+	
+	public long[] fib_tester_2() {
+		int low = 0;
+		int high = 1000;
+		long totaltime1 = 0;
+		long totaltime2 = 0;
+		long totaltime3 = 0;
+		long[] times = new long[3];
+		for (int i=0; i<10; i++ ) {
+			int[] test = new int[1000];
+			Random rd = new Random();
+			for (int j=0; j<test.length-1; j++) {
+				test[j] = rd.nextInt(high-low) + low;
+			}
+			//method 1
+			long startTime1 = System.nanoTime();
+			System.out.println("1(" + i + "): " + this.find_longest_fibsequence_1(test));
+			//this.find_longest_fibsequence_1(test);
+			long endTime1 = System.nanoTime();
+			totaltime1 = totaltime1 + (endTime1 - startTime1);
+			times[0] = totaltime1/10;
+
+			//method 2
+			long startTime2 = System.nanoTime();
+			System.out.println("2(" + i + "): " + this.find_longest_fibsequence_2(test));
+			//this.find_longest_fibsequence_2(test);
+			long endTime2 = System.nanoTime();
+			totaltime2 = totaltime2 + (endTime2 - startTime2);
+			times[1] = totaltime2/10;
+
+			//method 3
+			long startTime3 = System.nanoTime();
+			System.out.println("3(" + i + "): " + this.find_longest_fibsequence_3(test));
+			//this.find_longest_fibsequence_3(test);
+			long endTime3 = System.nanoTime();
+			totaltime3 = totaltime3 + (endTime3 - startTime3);
+			times[2] = totaltime3/10;
+		}
+    	return times;
 	}
